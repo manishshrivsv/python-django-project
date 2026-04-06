@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{car.title}}</h2>
+{% if car.image %}
+<img src="{{car.image.url}}" width="300">
+{% endif %}
+<p>{{car.description}}</p>
+<h4>
+    Highest Bid
+    <span id="liveBid">₹{{car.highest_bid}}</span>
+</h4>
+{% if user.is_authenticated %}
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button>Bid</button>
+</form>
+{% endif %}
+{% for bid in bids %}
+<p>{{bid.user}} : {{bid.amount}}</p>
+{% endfor %}
+{% endblock %}
+
+
+<script>
+
+    function updateBid() {
+
+        fetch("/api/highest-bid/{{car.id}}/")
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("liveBid").innerText =
+                    "₹" + data.highest_bid;
+
+            });
+
+    }
+
+    // ⏱ har 3 sec me update
+    setInterval(updateBid, 3000);
+
+</script>
